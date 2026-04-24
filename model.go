@@ -414,7 +414,7 @@ type PaymentStatusWebhook struct {
 	SignedAt           string              `json:"signedAt"`
 	NotificationConfig *NotificationConfig `json:"notificationConfig"`
 	Version            string              `json:"version,omitempty"`
-	Payment            *WebhookPayment     `json:"payment"`
+	Payment            *PaymentResponse    `json:"payment"`
 }
 
 // PaymentRefundWebhook PAYMENT.REFUND 事件载荷
@@ -424,7 +424,7 @@ type PaymentRefundWebhook struct {
 	SignedAt           string              `json:"signedAt"`
 	NotificationConfig *NotificationConfig `json:"notificationConfig"`
 	Version            string              `json:"version,omitempty"`
-	Payment            *WebhookPayment     `json:"payment"`
+	Payment            *PaymentResponse    `json:"payment"`
 }
 
 // DisputeOpenWebhook DISPUTE.OPENED 事件载荷
@@ -498,25 +498,6 @@ type DisputePaymentMethodData struct {
 type NotificationConfig struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`
-}
-
-// WebhookPayment Webhook 中的支付详情
-type WebhookPayment struct {
-	ID            string                 `json:"id"`
-	Date          Time                   `json:"date"`
-	DateUpdated   Time                   `json:"dateUpdated"`
-	Status        PaymentStatus          `json:"status"`
-	OrderID       string                 `json:"orderId"`
-	CurrencyCode  string                 `json:"currencyCode"`
-	Amount        int64                  `json:"amount"`
-	CustomerID    string                 `json:"customerId,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
-	Customer      *CustomerDetails       `json:"customer,omitempty"`
-	PaymentMethod *WebhookPaymentMethod  `json:"paymentMethod"`
-	Processor     *Processor             `json:"processor,omitempty"`
-	StatusReason  *StatusReason          `json:"statusReason,omitempty"`
-	Transactions  []Transaction          `json:"transactions"`
-	RiskData      *RiskData              `json:"riskData,omitempty"`
 }
 
 // WebhookPaymentMethod Webhook 中的支付方式信息

@@ -169,7 +169,7 @@ func handleDisputeStatus(body []byte) {
 	}
 }
 
-func printPaymentMethodInfo(payment *primer.WebhookPayment) {
+func printPaymentMethodInfo(payment *primer.PaymentResponse) {
 	pm := payment.PaymentMethod
 	if pm == nil {
 		return
@@ -192,7 +192,7 @@ func printPaymentMethodInfo(payment *primer.WebhookPayment) {
 	}
 }
 
-func printTransactions(payment *primer.WebhookPayment) {
+func printTransactions(payment *primer.PaymentResponse) {
 	for i, tx := range payment.Transactions {
 		log.Printf("  tx[%d]: type=%s processor=%s status=%s amount=%d %s",
 			i, tx.TransactionType, tx.ProcessorName, tx.ProcessorStatus,
