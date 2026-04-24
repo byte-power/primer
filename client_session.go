@@ -6,9 +6,9 @@ import "net/url"
 
 // CreateClientSession 创建客户端会话
 // POST /client-session
-func (c *Client) CreateClientSession(req *CreateClientSessionRequest) (*ClientSessionWithTokenResponse, *Error) {
+func (c *Client) CreateClientSession(req *CreateClientSessionRequest, opts ...RequestOption) (*ClientSessionWithTokenResponse, *Error) {
 	var resp ClientSessionWithTokenResponse
-	if err := c.doPost("/client-session", req, &resp); err != nil {
+	if err := c.doPost("/client-session", req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -16,9 +16,9 @@ func (c *Client) CreateClientSession(req *CreateClientSessionRequest) (*ClientSe
 
 // UpdateClientSession 更新客户端会话
 // PATCH /client-session
-func (c *Client) UpdateClientSession(req *UpdateClientSessionRequest) (*ClientSessionWithTokenResponse, *Error) {
+func (c *Client) UpdateClientSession(req *UpdateClientSessionRequest, opts ...RequestOption) (*ClientSessionWithTokenResponse, *Error) {
 	var resp ClientSessionWithTokenResponse
-	if err := c.doPatch("/client-session", req, &resp); err != nil {
+	if err := c.doPatch("/client-session", req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil

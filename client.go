@@ -21,6 +21,19 @@ var defaultHTTPClient = &http.Client{
 	Timeout: 90 * time.Second,
 }
 
+// RequestOption configures optional per-request behaviour (e.g. idempotency).
+type RequestOption func(h http.Header)
+
+// WithIdempotencyKey attaches an X-Idempotency-Key header to the request.
+// Primer uses this to deduplicate retried mutations so the same side-effect
+// (charge, refund, …) is applied at most once.
+// See https://primer.io/docs/api-reference/get-started/idempotency-key
+func WithIdempotencyKey(key string) RequestOption {
+	return func(h http.Header) {
+		h.Set("X-Idempotency-Key", key)
+	}
+}
+
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
@@ -91,27 +104,22 @@ func (c *Client) doGet(endpoint string, params url.Values, response any) *Error 
 }
 
 // doPost 执行 HTTP POST 请求
-func (c *Client) doPost(endpoint string, body any, response any) *Error {
-	return c.doRequest(http.MethodPost, endpoint, body, response, nil)
-}
-
-// doPostWithHeaders 执行带自定义 Headers 的 HTTP POST 请求
-func (c *Client) doPostWithHeaders(endpoint string, body any, response any, headers map[string]string) *Error {
-	return c.doRequest(http.MethodPost, endpoint, body, response, headers)
+func (c *Client) doPost(endpoint string, body any, response any, opts ...RequestOption) *Error {
+	return c.doRequest(http.MethodPost, endpoint, body, response, opts...)
 }
 
 // doPatch 执行 HTTP PATCH 请求
-func (c *Client) doPatch(endpoint string, body any, response any) *Error {
-	return c.doRequest(http.MethodPatch, endpoint, body, response, nil)
+func (c *Client) doPatch(endpoint string, body any, response any, opts ...RequestOption) *Error {
+	return c.doRequest(http.MethodPatch, endpoint, body, response, opts...)
 }
 
 // doDelete 执行 HTTP DELETE 请求
-func (c *Client) doDelete(endpoint string, response any) *Error {
-	return c.doRequest(http.MethodDelete, endpoint, nil, response, nil)
+func (c *Client) doDelete(endpoint string, response any, opts ...RequestOption) *Error {
+	return c.doRequest(http.MethodDelete, endpoint, nil, response, opts...)
 }
 
 // doRequest 执行 HTTP 请求（POST/PATCH/PUT/DELETE）
-func (c *Client) doRequest(method, endpoint string, body any, response any, extraHeaders map[string]string) *Error {
+func (c *Client) doRequest(method, endpoint string, body any, response any, opts ...RequestOption) *Error {
 	reqURL := c.baseURL + endpoint
 
 	var bodyReader io.Reader
@@ -142,8 +150,8 @@ func (c *Client) doRequest(method, endpoint string, body any, response any, extr
 	req.Header.Set("X-API-KEY", c.apiKey)
 	req.Header.Set("X-Api-Version", apiVersion)
 
-	for k, v := range extraHeaders {
-		req.Header.Set(k, v)
+	for _, opt := range opts {
+		opt(req.Header)
 	}
 
 	return c.executeRequest(req, reqURL, response)

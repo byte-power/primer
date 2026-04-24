@@ -9,9 +9,9 @@ import (
 
 // VaultPaymentMethod 保存支付方式
 // POST /payment-instruments/{paymentMethodToken}/vault
-func (c *Client) VaultPaymentMethod(paymentMethodToken string, req *VaultPaymentMethodRequest) (*PaymentMethodTokenResponse, *Error) {
+func (c *Client) VaultPaymentMethod(paymentMethodToken string, req *VaultPaymentMethodRequest, opts ...RequestOption) (*PaymentMethodTokenResponse, *Error) {
 	var resp PaymentMethodTokenResponse
-	if err := c.doPost(fmt.Sprintf("/payment-instruments/%s/vault", paymentMethodToken), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payment-instruments/%s/vault", paymentMethodToken), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -32,9 +32,9 @@ func (c *Client) ListPaymentMethods(customerID string) (*PaymentMethodTokenListR
 
 // DeletePaymentMethod 删除已保存的支付方式
 // DELETE /payment-instruments/{paymentMethodToken}
-func (c *Client) DeletePaymentMethod(paymentMethodToken string) (*PaymentMethodTokenResponse, *Error) {
+func (c *Client) DeletePaymentMethod(paymentMethodToken string, opts ...RequestOption) (*PaymentMethodTokenResponse, *Error) {
 	var resp PaymentMethodTokenResponse
-	if err := c.doDelete(fmt.Sprintf("/payment-instruments/%s", paymentMethodToken), &resp); err != nil {
+	if err := c.doDelete(fmt.Sprintf("/payment-instruments/%s", paymentMethodToken), &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -42,9 +42,9 @@ func (c *Client) DeletePaymentMethod(paymentMethodToken string) (*PaymentMethodT
 
 // SetDefaultPaymentMethod 设置默认支付方式
 // POST /payment-instruments/{paymentMethodToken}/default
-func (c *Client) SetDefaultPaymentMethod(paymentMethodToken string) (*PaymentMethodTokenResponse, *Error) {
+func (c *Client) SetDefaultPaymentMethod(paymentMethodToken string, opts ...RequestOption) (*PaymentMethodTokenResponse, *Error) {
 	var resp PaymentMethodTokenResponse
-	if err := c.doPost(fmt.Sprintf("/payment-instruments/%s/default", paymentMethodToken), nil, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payment-instruments/%s/default", paymentMethodToken), nil, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil

@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/google/uuid"
+
 	"github.com/byte-power/primer"
 )
 
@@ -21,25 +23,41 @@ func main() {
 
 	client := primer.NewClient(apiKey, nil)
 
-	// ===== 1. 创建支付 =====
-	fmt.Println("=== Create Payment ===")
+	// ===== 1. 创建支付（使用幂等键）=====
+	fmt.Println("=== Create Payment (with Idempotency Key) ===")
 
+	idempotencyKey := uuid.New().String()
 	amount := int64(5000)
-	payment, err := client.CreatePayment(&primer.CreatePaymentRequest{
+	createReq := &primer.CreatePaymentRequest{
 		PaymentMethodToken: paymentMethodToken,
 		OrderID:            "order-demo-001",
 		CurrencyCode:       "EUR",
 		Amount:             &amount,
-	})
+	}
+
+	payment, err := client.CreatePayment(createReq, primer.WithIdempotencyKey(idempotencyKey))
 	if err != nil {
 		log.Fatalf("CreatePayment failed: %s (status=%d, errorId=%s)",
 			err.Message, err.StatusCode, err.ErrorID)
 	}
 
-	fmt.Printf("Payment ID:  %s\n", payment.ID)
-	fmt.Printf("Status:      %s\n", payment.Status)
-	fmt.Printf("Amount:      %d %s\n", payment.Amount, payment.CurrencyCode)
-	fmt.Printf("Order ID:    %s\n", payment.OrderID)
+	fmt.Printf("Payment ID:       %s\n", payment.ID)
+	fmt.Printf("Status:           %s\n", payment.Status)
+	fmt.Printf("Amount:           %d %s\n", payment.Amount, payment.CurrencyCode)
+	fmt.Printf("Order ID:         %s\n", payment.OrderID)
+	fmt.Printf("Idempotency Key:  %s\n", idempotencyKey)
+
+	// 使用相同的幂等键重试——Primer 会返回 409（IdempotencyKeyAlreadyExists），
+	// 说明原请求已成功处理，不会重复扣款。
+	fmt.Println("\n=== Retry with same Idempotency Key (expect 409) ===")
+
+	_, retryErr := client.CreatePayment(createReq, primer.WithIdempotencyKey(idempotencyKey))
+	if retryErr != nil {
+		fmt.Printf("Expected error:   %s (status=%d, errorId=%s)\n",
+			retryErr.Message, retryErr.StatusCode, retryErr.ErrorID)
+	} else {
+		fmt.Println("No error returned (server may have returned cached response)")
+	}
 
 	if payment.RequiredAction != nil {
 		fmt.Printf("Required Action: %s - %s\n", payment.RequiredAction.Name, payment.RequiredAction.Description)
@@ -75,20 +93,22 @@ func main() {
 
 		fmt.Printf("Status after capture: %s\n", captured.Status)
 
-		// ===== 4. 退款（仅在 SETTLED/SETTLING 状态时）=====
+		// ===== 4. 退款（使用幂等键，仅在 SETTLED/SETTLING 状态时）=====
 		if captured.Status == primer.PaymentStatusSettled || captured.Status == primer.PaymentStatusSettling {
-			fmt.Println("\n=== Refund Payment ===")
+			fmt.Println("\n=== Refund Payment (with Idempotency Key) ===")
 
+			refundKey := uuid.New().String()
 			refundAmount := int64(2000)
 			refunded, err := client.RefundPayment(payment.ID, &primer.RefundPaymentRequest{
 				Amount: &refundAmount,
 				Reason: "partial refund demo",
-			})
+			}, primer.WithIdempotencyKey(refundKey))
 			if err != nil {
 				log.Fatalf("RefundPayment failed: %s", err.Message)
 			}
 
 			fmt.Printf("Status after refund: %s\n", refunded.Status)
+			fmt.Printf("Refund idempotency:  %s\n", refundKey)
 			if refunded.Processor != nil {
 				fmt.Printf("Amount refunded:     %d\n", refunded.Processor.AmountRefunded)
 			}

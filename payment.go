@@ -11,25 +11,19 @@ import (
 
 // CreatePayment 创建支付
 // POST /payments
-func (c *Client) CreatePayment(req *CreatePaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) CreatePayment(req *CreatePaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost("/payments", req, &resp); err != nil {
+	if err := c.doPost("/payments", req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
 }
 
-// CreatePaymentWithIdempotencyKey 使用幂等键创建支付
-// POST /payments (with Idempotency-Key header)
+// Deprecated: Use CreatePayment with WithIdempotencyKey option instead.
+//
+//	resp, err := client.CreatePayment(req, primer.WithIdempotencyKey("key"))
 func (c *Client) CreatePaymentWithIdempotencyKey(req *CreatePaymentRequest, idempotencyKey string) (*PaymentResponse, *Error) {
-	headers := map[string]string{
-		"Idempotency-Key": idempotencyKey,
-	}
-	var resp PaymentResponse
-	if err := c.doPostWithHeaders("/payments", req, &resp, headers); err != nil {
-		return nil, err
-	}
-	return &resp, nil
+	return c.CreatePayment(req, WithIdempotencyKey(idempotencyKey))
 }
 
 // GetPayment 获取支付详情
@@ -44,9 +38,9 @@ func (c *Client) GetPayment(paymentID string) (*PaymentResponse, *Error) {
 
 // CapturePayment 捕获支付
 // POST /payments/{id}/capture
-func (c *Client) CapturePayment(paymentID string, req *CapturePaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) CapturePayment(paymentID string, req *CapturePaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/capture", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/capture", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -54,9 +48,9 @@ func (c *Client) CapturePayment(paymentID string, req *CapturePaymentRequest) (*
 
 // CancelPayment 取消支付
 // POST /payments/{id}/cancel
-func (c *Client) CancelPayment(paymentID string, req *CancelPaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) CancelPayment(paymentID string, req *CancelPaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/cancel", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/cancel", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -64,9 +58,9 @@ func (c *Client) CancelPayment(paymentID string, req *CancelPaymentRequest) (*Pa
 
 // RefundPayment 退款
 // POST /payments/{id}/refund
-func (c *Client) RefundPayment(paymentID string, req *RefundPaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) RefundPayment(paymentID string, req *RefundPaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/refund", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/refund", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -74,9 +68,9 @@ func (c *Client) RefundPayment(paymentID string, req *RefundPaymentRequest) (*Pa
 
 // ResumePayment 恢复支付
 // POST /payments/{id}/resume
-func (c *Client) ResumePayment(paymentID string, req *ResumePaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) ResumePayment(paymentID string, req *ResumePaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/resume", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/resume", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -84,9 +78,9 @@ func (c *Client) ResumePayment(paymentID string, req *ResumePaymentRequest) (*Pa
 
 // AuthorizePayment 授权支付
 // POST /payments/{id}/authorize
-func (c *Client) AuthorizePayment(paymentID string, req *AuthorizePaymentRequest) (*PaymentResponse, *Error) {
+func (c *Client) AuthorizePayment(paymentID string, req *AuthorizePaymentRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/authorize", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/authorize", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -94,9 +88,9 @@ func (c *Client) AuthorizePayment(paymentID string, req *AuthorizePaymentRequest
 
 // AdjustAuthorization 调整授权金额
 // POST /payments/{id}/adjust-authorization
-func (c *Client) AdjustAuthorization(paymentID string, req *AdjustAuthorizationRequest) (*PaymentResponse, *Error) {
+func (c *Client) AdjustAuthorization(paymentID string, req *AdjustAuthorizationRequest, opts ...RequestOption) (*PaymentResponse, *Error) {
 	var resp PaymentResponse
-	if err := c.doPost(fmt.Sprintf("/payments/%s/adjust-authorization", paymentID), req, &resp); err != nil {
+	if err := c.doPost(fmt.Sprintf("/payments/%s/adjust-authorization", paymentID), req, &resp, opts...); err != nil {
 		return nil, err
 	}
 	return &resp, nil
