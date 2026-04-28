@@ -87,10 +87,6 @@ func (c *Client) doGet(endpoint string, params url.Values, response any) *Error 
 		reqURL += "?" + params.Encode()
 	}
 
-	c.logger.Debug("primer_request",
-		String("method", "GET"),
-		String("url", reqURL))
-
 	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
 	if err != nil {
 		return WrapError(err, "failed to create request")
@@ -99,6 +95,11 @@ func (c *Client) doGet(endpoint string, params url.Values, response any) *Error 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("X-API-KEY", c.apiKey)
 	req.Header.Set("X-Api-Version", apiVersion)
+
+	c.logger.Debug("primer_request",
+		String("method", "GET"),
+		String("url", reqURL),
+		Any("headers", req.Header))
 
 	return c.executeRequest(req, reqURL, response)
 }
@@ -123,21 +124,14 @@ func (c *Client) doRequest(method, endpoint string, body any, response any, opts
 	reqURL := c.baseURL + endpoint
 
 	var bodyReader io.Reader
+	var bodyStr string
 	if body != nil {
 		data, err := json.Marshal(body)
 		if err != nil {
 			return WrapError(err, "failed to marshal request body")
 		}
 		bodyReader = bytes.NewReader(data)
-
-		c.logger.Debug("primer_request",
-			String("method", method),
-			String("url", reqURL),
-			String("body", string(data)))
-	} else {
-		c.logger.Debug("primer_request",
-			String("method", method),
-			String("url", reqURL))
+		bodyStr = string(data)
 	}
 
 	req, err := http.NewRequest(method, reqURL, bodyReader)
@@ -152,6 +146,19 @@ func (c *Client) doRequest(method, endpoint string, body any, response any, opts
 
 	for _, opt := range opts {
 		opt(req.Header)
+	}
+
+	if bodyStr != "" {
+		c.logger.Debug("primer_request",
+			String("method", method),
+			String("url", reqURL),
+			Any("headers", req.Header),
+			String("body", bodyStr))
+	} else {
+		c.logger.Debug("primer_request",
+			String("method", method),
+			String("url", reqURL),
+			Any("headers", req.Header))
 	}
 
 	return c.executeRequest(req, reqURL, response)
@@ -180,6 +187,7 @@ func (c *Client) executeRequest(req *http.Request, reqURL string, response any) 
 	c.logger.Debug("primer_response",
 		String("url", reqURL),
 		Int("status_code", resp.StatusCode),
+		Any("headers", resp.Header),
 		String("body", string(respBody)))
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

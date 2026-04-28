@@ -36,6 +36,11 @@ func Bool(key string, value bool) Field {
 	return Field{Key: key, Value: value}
 }
 
+// Any 创建任意类型字段
+func Any(key string, value interface{}) Field {
+	return Field{Key: key, Value: value}
+}
+
 // ErrorField 创建错误字段
 func ErrorField(err error) Field {
 	return Field{Key: "error", Value: err}
