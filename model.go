@@ -60,7 +60,7 @@ type CreateClientSessionRequest struct {
 	Order         *OrderDetails          `json:"order,omitempty"`
 	CustomerID    string                 `json:"customerId,omitempty"`
 	Customer      *CustomerDetails       `json:"customer,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Metadata      map[string]string     `json:"metadata,omitempty"`
 	PaymentMethod *PaymentMethodRequest  `json:"paymentMethod,omitempty"`
 }
 
@@ -85,7 +85,7 @@ type ClientSessionWithTokenResponse struct {
 	OrderID                   string                 `json:"orderId,omitempty"`
 	CurrencyCode              string                 `json:"currencyCode,omitempty"`
 	Amount                    int64                  `json:"amount,omitempty"`
-	Metadata                  map[string]interface{} `json:"metadata,omitempty"`
+	Metadata                  map[string]string      `json:"metadata,omitempty"`
 	Customer                  *CustomerDetails       `json:"customer,omitempty"`
 	Order                     *OrderDetails          `json:"order,omitempty"`
 	PaymentMethod             *PaymentMethodOptions  `json:"paymentMethod"`
@@ -106,7 +106,7 @@ type UpdateClientSessionRequest struct {
 	OrderID       string                 `json:"orderId,omitempty"`
 	CurrencyCode  string                 `json:"currencyCode,omitempty"`
 	Amount        *int64                 `json:"amount,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Metadata      map[string]string     `json:"metadata,omitempty"`
 	Customer      *CustomerDetails       `json:"customer,omitempty"`
 	Order         *OrderDetails          `json:"order,omitempty"`
 	PaymentMethod *PaymentMethodRequest  `json:"paymentMethod,omitempty"`
@@ -118,7 +118,7 @@ type ClientSessionResponse struct {
 	OrderID       string                 `json:"orderId,omitempty"`
 	CurrencyCode  string                 `json:"currencyCode,omitempty"`
 	Amount        int64                  `json:"amount,omitempty"`
-	Metadata      map[string]interface{} `json:"metadata,omitempty"`
+	Metadata      map[string]string     `json:"metadata,omitempty"`
 	Customer      *CustomerDetails       `json:"customer,omitempty"`
 	Order         *OrderDetails          `json:"order,omitempty"`
 	PaymentMethod *PaymentMethodOptions  `json:"paymentMethod"`
@@ -222,29 +222,30 @@ type CreatePaymentRequest struct {
 	Order              *OrderDetails          `json:"order,omitempty"`
 	CustomerID         string                 `json:"customerId,omitempty"`
 	Customer           *CustomerDetails       `json:"customer,omitempty"`
-	Metadata           map[string]interface{} `json:"metadata,omitempty"`
+	Metadata           map[string]string     `json:"metadata,omitempty"`
 	PaymentMethod      *PaymentMethodRequest  `json:"paymentMethod,omitempty"`
 }
 
 // PaymentResponse 支付 API 通用响应
 type PaymentResponse struct {
-	ID             string                 `json:"id"`
-	Date           Time                   `json:"date"`
-	DateUpdated    Time                   `json:"dateUpdated"`
-	Status         PaymentStatus          `json:"status"`
-	OrderID        string                 `json:"orderId"`
-	CurrencyCode   string                 `json:"currencyCode"`
-	Amount         int64                  `json:"amount"`
-	CustomerID     string                 `json:"customerId,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata,omitempty"`
-	Customer       *CustomerDetails       `json:"customer,omitempty"`
-	Order          *OrderDetails          `json:"order,omitempty"`
-	PaymentMethod  *WebhookPaymentMethod  `json:"paymentMethod"`
-	Processor      *Processor             `json:"processor,omitempty"`
-	RequiredAction *RequiredAction        `json:"requiredAction,omitempty"`
-	StatusReason   *StatusReason          `json:"statusReason,omitempty"`
-	Transactions   []Transaction          `json:"transactions"`
-	RiskData       *RiskData              `json:"riskData,omitempty"`
+	ID             string                `json:"id"`
+	Date           Time                  `json:"date"`
+	DateUpdated    Time                  `json:"dateUpdated"`
+	Status         PaymentStatus         `json:"status"`
+	CardTokenType  string                `json:"cardTokenType,omitempty"`
+	OrderID        string                `json:"orderId"`
+	CurrencyCode   string                `json:"currencyCode"`
+	Amount         int64                 `json:"amount"`
+	CustomerID     string                `json:"customerId,omitempty"`
+	Metadata       map[string]string     `json:"metadata,omitempty"`
+	Customer       *CustomerDetails      `json:"customer,omitempty"`
+	Order          *OrderDetails         `json:"order,omitempty"`
+	PaymentMethod  *WebhookPaymentMethod `json:"paymentMethod"`
+	Processor      *Processor            `json:"processor,omitempty"`
+	RequiredAction *RequiredAction       `json:"requiredAction,omitempty"`
+	StatusReason   *StatusReason         `json:"statusReason,omitempty"`
+	Transactions   []Transaction         `json:"transactions"`
+	RiskData       *RiskData             `json:"riskData,omitempty"`
 }
 
 // RequiredAction 需要执行的操作（如 3DS）
@@ -259,7 +260,7 @@ type CapturePaymentRequest struct {
 	Amount   *int64                 `json:"amount,omitempty"`
 	Final    *bool                  `json:"final,omitempty"`
 	Order    *CaptureOrderDetails   `json:"order,omitempty"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // CaptureOrderDetails capture 时可更新的订单信息
@@ -339,7 +340,7 @@ type PaymentSummary struct {
 	CurrencyCode string                 `json:"currencyCode"`
 	Amount       int64                  `json:"amount"`
 	Processor    *PaymentSummaryProc    `json:"processor,omitempty"`
-	Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	Metadata     map[string]string `json:"metadata,omitempty"`
 }
 
 // PaymentSummaryProc 支付摘要中的处理器信息
@@ -586,6 +587,7 @@ type Transaction struct {
 	ProcessorMerchantID    string        `json:"processorMerchantId"`
 	ProcessorStatus        PaymentStatus `json:"processorStatus"`
 	ProcessorStatusReason  *StatusReason `json:"processorStatusReason,omitempty"`
+	CardTokenType          string        `json:"cardTokenType,omitempty"`
 	Reason                 string        `json:"reason,omitempty"`
 }
 

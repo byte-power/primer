@@ -98,7 +98,7 @@ func main() {
 	updated, err := client.UpdateClientSession(&primer.UpdateClientSessionRequest{
 		ClientToken: created.ClientToken,
 		Amount:      &newAmount,
-		Metadata: map[string]interface{}{
+		Metadata: map[string]string{
 			"source": "go-sdk-example",
 		},
 	})
