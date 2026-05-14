@@ -37,7 +37,7 @@ func main() {
 
 		fmt.Printf("Saved Token:  %s\n", saved.Token)
 		fmt.Printf("Token Type:   %s\n", saved.TokenType)
-		fmt.Printf("Method Type:  %s\n", saved.PaymentMethodType)
+		fmt.Printf("Method Type:  %s\n", saved.PaymentInstrumentType)
 		fmt.Printf("Customer ID:  %s\n", saved.CustomerID)
 		fmt.Printf("Is Default:   %v\n", saved.Default)
 	}
