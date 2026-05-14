@@ -9,8 +9,8 @@ import (
 
 // VaultPaymentMethod 保存支付方式
 // POST /payment-instruments/{paymentMethodToken}/vault
-func (c *Client) VaultPaymentMethod(paymentMethodToken string, req *VaultPaymentMethodRequest, opts ...RequestOption) (*PaymentMethodTokenResponse, *Error) {
-	var resp PaymentMethodTokenResponse
+func (c *Client) VaultPaymentMethod(paymentMethodToken string, req *VaultPaymentMethodRequest, opts ...RequestOption) (*VaultPaymentMethodTokenResponse, *Error) {
+	var resp VaultPaymentMethodTokenResponse
 	if err := c.doPost(fmt.Sprintf("/payment-instruments/%s/vault", paymentMethodToken), req, &resp, opts...); err != nil {
 		return nil, err
 	}

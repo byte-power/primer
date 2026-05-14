@@ -356,6 +356,18 @@ type VaultPaymentMethodRequest struct {
 	CustomerID string `json:"customerId"`
 }
 
+type VaultPaymentMethodTokenResponse struct {
+	CreatedAt             Time            `json:"createdAt"`
+	Token                 string          `json:"token"`
+	TokenType             string          `json:"tokenType"`
+	AnalyticsID           string          `json:"analyticsId"`
+	PaymentInstrumentType string          `json:"paymentInstrumentType"`
+	PaymentInstrumentData json.RawMessage `json:"paymentInstrumentData"`
+	CustomerID            string          `json:"customerId"`
+	Default               bool            `json:"default"`
+	Deleted               bool            `json:"deleted,omitempty"`
+}
+
 // PaymentMethodTokenResponse 支付方式令牌响应
 type PaymentMethodTokenResponse struct {
 	CreatedAt         Time            `json:"createdAt"`
